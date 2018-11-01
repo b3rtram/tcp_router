@@ -10,8 +10,14 @@ import (
 //TCPRouter router is the struct
 type TCPRouter struct {
 	listen net.Listener
-	routes map[string]func(net.Conn, string)
+	routes map[string](chan Msg)
 	conns  []net.Conn
+}
+
+//Msg sends over the generated channels
+type Msg struct {
+	conn net.Conn
+	msg  string
 }
 
 //StartServer starts the server
@@ -32,7 +38,6 @@ func (t *TCPRouter) StartServer(typ string, host string, delimiter byte) {
 
 	go func() {
 		for {
-
 			conn, err := t.listen.Accept()
 			if err != nil {
 				fmt.Println(err)
@@ -50,19 +55,18 @@ func (t *TCPRouter) startRead(c net.Conn, delimiter byte) {
 
 	for {
 		msg, _ := reader.ReadString(delimiter)
-
 		sa := strings.SplitN(msg, " ", 2)
-
 		val, ok := t.routes[sa[0]]
-
 		if ok {
-			val(c, msg)
+			val <- Msg{conn: c, msg: msg}
 		}
-
 	}
 }
 
 //AddRoute adds a route to the server
-func (t *TCPRouter) AddRoute(route string, f func(net.Conn, string)) {
-	t.routes[route] = f
+func (t *TCPRouter) AddRoute(route string) chan Msg {
+	c := make(chan Msg)
+	t.routes[route] = c
+
+	return c
 }
