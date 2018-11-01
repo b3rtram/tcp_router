@@ -10,19 +10,23 @@ func TestStartServer(t *testing.T) {
 	tr := TCPRouter{}
 	fmt.Println("Start Test")
 	tr.StartServer("tcp", "localhost:3678", '\n')
-	c := tr.AddRoute("CONNNECT")
+	c := tr.AddRoute("CONNECT")
 
 	conn, err := net.Dial("tcp", "localhost:3678")
 
 	if err != nil {
 		t.Fatal(err)
 	}
-
 	fmt.Println("Dialed")
+	conn.Write([]byte("CONNECT test\n"))
 
 	defer conn.Close()
 
 	msg := <-c
 	fmt.Println(msg)
+
+	defer func() {
+		tr.StopServer()
+	}()
 
 }

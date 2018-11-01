@@ -54,6 +54,7 @@ func (t *TCPRouter) startRead(c net.Conn, delimiter byte) {
 
 	for {
 		msg, _ := reader.ReadString(delimiter)
+		fmt.Printf("MSG: %s", msg)
 		sa := strings.SplitN(msg, " ", 2)
 		val, ok := t.routes[sa[0]]
 		if ok {
@@ -70,7 +71,7 @@ func (t *TCPRouter) AddRoute(route string) chan Msg {
 	return c
 }
 
-//CloseServer to manually close the Server
-func (t *TCPRouter) CloseServer() {
+//StopServer to manually close the Server
+func (t *TCPRouter) StopServer() {
 	t.listen.Close()
 }
