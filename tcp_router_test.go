@@ -8,22 +8,21 @@ import (
 
 func TestStartServer(t *testing.T) {
 	tr := TCPRouter{}
+	fmt.Println("Start Test")
 	tr.StartServer("tcp", "localhost:3678", '\n')
 	c := tr.AddRoute("CONNNECT")
 
-	go func() {
-		msg := <-c
-		fmt.Println(msg)
-	}()
-
-	conn, err := net.Dial("tcp", ":3678")
+	conn, err := net.Dial("tcp", "localhost:3678")
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
+	fmt.Println("Dialed")
+
 	defer conn.Close()
 
-	conn.Write([]byte("SUBSCRIBE test\n"))
+	msg := <-c
+	fmt.Println(msg)
 
 }

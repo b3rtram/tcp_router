@@ -24,6 +24,7 @@ type Msg struct {
 func (t *TCPRouter) StartServer(typ string, host string, delimiter byte) {
 
 	var err error
+	t.routes = make(map[string](chan Msg))
 	t.listen, err = net.Listen(typ, host)
 
 	if err != nil {
@@ -31,14 +32,11 @@ func (t *TCPRouter) StartServer(typ string, host string, delimiter byte) {
 		return
 	}
 
-	defer func() {
-		t.listen.Close()
-		fmt.Println("Listener closed")
-	}()
-
 	go func() {
 		for {
+			fmt.Println("start listening")
 			conn, err := t.listen.Accept()
+			fmt.Println("client connected")
 			if err != nil {
 				fmt.Println(err)
 				continue
@@ -51,6 +49,7 @@ func (t *TCPRouter) StartServer(typ string, host string, delimiter byte) {
 
 func (t *TCPRouter) startRead(c net.Conn, delimiter byte) {
 
+	fmt.Println("start reading")
 	reader := bufio.NewReader(c)
 
 	for {
@@ -69,4 +68,9 @@ func (t *TCPRouter) AddRoute(route string) chan Msg {
 	t.routes[route] = c
 
 	return c
+}
+
+//CloseServer to manually close the Server
+func (t *TCPRouter) CloseServer() {
+	t.listen.Close()
 }
