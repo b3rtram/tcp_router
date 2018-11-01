@@ -9,10 +9,10 @@ import (
 func TestStartServer(t *testing.T) {
 	tr := TCPRouter{}
 	fmt.Println("Start Test")
-	tr.StartServer("tcp", "localhost:3678", '\n')
+	tr.StartServer("tcp", "localhost:3001", '\n')
 	c := tr.AddRoute("CONNECT")
 
-	conn, err := net.Dial("tcp", "localhost:3678")
+	conn, err := net.Dial("tcp", "localhost:3001")
 
 	if err != nil {
 		t.Fatal(err)
