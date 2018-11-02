@@ -10,7 +10,14 @@ func TestStartServer(t *testing.T) {
 	tr := TCPRouter{}
 	fmt.Println("Start Test")
 	tr.StartServer("tcp", "localhost:3001", '\n')
-	c := tr.AddRoute("CONNECT")
+
+	c := make(chan bool)
+	f := func(conn net.Conn, msg string) {
+		fmt.Println(msg)
+		c <- true
+	}
+
+	tr.AddRoute("CONNECT", f)
 
 	conn, err := net.Dial("tcp", "localhost:3001")
 
@@ -20,13 +27,13 @@ func TestStartServer(t *testing.T) {
 	fmt.Println("Dialed")
 	conn.Write([]byte("CONNECT test\n"))
 
-	defer conn.Close()
-
-	msg := <-c
-	fmt.Println(msg)
-
 	defer func() {
+		conn.Close()
 		tr.StopServer()
 	}()
+
+	b := <-c
+
+	fmt.Println(b)
 
 }
