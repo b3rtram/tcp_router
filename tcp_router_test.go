@@ -1,4 +1,4 @@
-package tcprouter
+package tcp_router
 
 import (
 	"fmt"
